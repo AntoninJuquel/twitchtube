@@ -1,0 +1,5 @@
+build
+yt-auth
+.env
+node_modules
+temp
