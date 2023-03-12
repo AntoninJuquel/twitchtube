@@ -1,10 +1,17 @@
-import { TwitchConfig, VideoConfig, YoutubeConfig } from "./types";
-const config: TwitchConfig & VideoConfig & YoutubeConfig = {
+import { Config } from "./types";
+
+import { initConfig } from "./utils";
+
+const config: Config = {
+  //// General ////
+  INTERVAL: 24,
+
+  //// Twitch ////
   LIMIT: 10,
   PERIOD: 24,
-  DATA: {
-    games: ["Fortnite"],
-    users: [],
+  SEARCH: {
+    games: [],
+    users: ["Amouranth"],
   },
   FILTER: {
     games: [],
@@ -18,6 +25,7 @@ const config: TwitchConfig & VideoConfig & YoutubeConfig = {
   CLIPS_DIR: "F:\\Videos\\clips",
   LOG_DIR: "logs",
 
+  //// Video ////
   RESOLUTION: {
     WIDTH: 1920,
     HEIGHT: 1080,
@@ -32,6 +40,7 @@ const config: TwitchConfig & VideoConfig & YoutubeConfig = {
   INTRO_PATH: "",
   OUTRO_PATH: "",
 
+  //// Youtube ////
   TITLE:
     "[{game}] Top {count} Clips of the Week, ({streamer}, {streamer}, {streamer})",
   DESCRIPTION: {
@@ -42,4 +51,5 @@ const config: TwitchConfig & VideoConfig & YoutubeConfig = {
   CHANNEL_NAME: "",
   HEADLESS: false,
 };
-export default config;
+
+export default initConfig(config);

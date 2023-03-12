@@ -117,7 +117,7 @@ export type TwitchConfig = {
   /**
    * List of games and users to search for clips
    */
-  DATA: {
+  SEARCH: {
     [Category.Games]: string[];
     [Category.Users]: string[];
   };

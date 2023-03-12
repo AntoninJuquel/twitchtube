@@ -21,10 +21,14 @@ export async function convertNamesToIds(
 
 export async function getIds(twitch: AxiosInstance): Promise<CategoryIdMap> {
   const ids: CategoryIdMap = {
-    game_id: await convertNamesToIds(twitch, config.DATA.games, Category.Games),
+    game_id: await convertNamesToIds(
+      twitch,
+      config.SEARCH.games,
+      Category.Games
+    ),
     broadcaster_id: await convertNamesToIds(
       twitch,
-      config.DATA.users,
+      config.SEARCH.users,
       Category.Users
     ),
   };
