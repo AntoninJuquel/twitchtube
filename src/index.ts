@@ -31,9 +31,9 @@ async function start() {
 }
 
 async function main() {
-  // await twitch.downloadClips();
-  // await video.mergeClips();
-  // await youtube.uploadVideo();
+  await twitch.downloadClips();
+  await video.mergeClips();
+  await youtube.uploadVideo();
 }
 
 async function end() {
