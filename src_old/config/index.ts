@@ -1,13 +1,12 @@
 import { Config } from "./types";
 
+import { initConfig } from "./utils";
+
 const config: Config = {
   //// General ////
   INTERVAL: 24,
-  LOG_DIR: "F:\\Documents\\logs",
 
   //// Twitch ////
-  TWITCH_AUTH_DIR: "F:\\Documents\\twitch-auth",
-  CLIPS_DIR: "F:\\Videos\\clips",
   LIMIT: 10,
   PERIOD: 24,
   SEARCH: {
@@ -23,15 +22,17 @@ const config: Config = {
     users: [],
   },
   REMOVE_CLIPS: true,
+  CLIPS_DIR: "F:\\Videos\\clips",
+  LOG_DIR: "logs",
 
   //// Video ////
-  TEMP_DIR: "F:\\Documents\\TEMP",
-  OUTPUT_DIR: "F:\\Videos\\rendered",
   RESOLUTION: {
     WIDTH: 1920,
     HEIGHT: 1080,
   },
   FRAMERATE: 60,
+  TEMP_DIR: "F:\\Documents\\TEMP",
+  OUTPUT_DIR: "F:\\Videos\\rendered",
   TRANSITION: {
     NAME: "fade",
     DURATION: 500,
@@ -51,4 +52,4 @@ const config: Config = {
   HEADLESS: false,
 };
 
-export default config;
+export default initConfig(config);

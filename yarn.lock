@@ -21,6 +21,11 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
+"@hypercliq/shutdown-cleanup@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@hypercliq/shutdown-cleanup/-/shutdown-cleanup-5.0.1.tgz#41c270807cb87692c94a89454a8e33c3ca47d9f3"
+  integrity sha512-BpiUdykJPL4jpJoXbPpErGZ8vUfrPlLUSAyVwV4OzUvkbxw3Nikv3NQjNaQ2SW5JWneZ+LCepchIvAwY5WaKKA==
+
 "@npmcli/fs@^2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@npmcli/fs/-/fs-2.1.2.tgz#a9e2541a4a2fec2e69c29b35e6060973da79b865"
@@ -66,6 +71,13 @@
   dependencies:
     "@types/node" "*"
     "@types/progress" "*"
+
+"@types/node-persist@^3.1.3":
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/@types/node-persist/-/node-persist-3.1.3.tgz#4ad222ccc3c80373e3afc7e1b758d7a28d44edf2"
+  integrity sha512-6MdN3tQcBdlnswJ/JGJYEwWh72Ru3RHH3I16PCQ/GB7ecM3YFfcUB4Yysim6HHnKbCse5vgk5r51JKR7w5zE0Q==
+  dependencies:
+    "@types/node" "*"
 
 "@types/node@*", "@types/node@^18.14.6":
   version "18.14.6"
@@ -1649,6 +1661,11 @@ node-gyp@^9.2.0:
     semver "^7.3.5"
     tar "^6.1.2"
     which "^2.0.2"
+
+node-persist@^3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/node-persist/-/node-persist-3.1.3.tgz#41e77a375fc56eeabb86cd02553cfc5e75b0ed6b"
+  integrity sha512-CaFv+kSZtsc+VeDRldK1yR47k1vPLBpzYB9re2z7LIwITxwBtljMq3s8VQnnr+x3E8pQfHbc5r2IyJsBLJhtXg==
 
 nodemon@^2.0.21:
   version "2.0.21"
