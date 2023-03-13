@@ -8,21 +8,16 @@ import {
   TwitchUser,
   TwitchClip,
 } from "./types";
+import path from "path";
 
-class Twitch {
+export default class Twitch {
   private twitch: AxiosInstance;
   private clientId: string;
   private clientSecret: string;
-  private authDir: string;
 
-  constructor(
-    clientId: string,
-    clientSecret: string,
-    authDir: string = "twitch-auth"
-  ) {
+  constructor(clientId: string, clientSecret: string) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.authDir = authDir;
     this.twitch = axios.create({
       baseURL: "https://api.twitch.tv/helix",
       headers: {
@@ -43,7 +38,7 @@ class Twitch {
 
   async init() {
     await storage.init({
-      dir: this.authDir,
+      dir: path.join(__dirname, "..", "..", "twitch-auth"),
     });
     const token = await storage.getItem("twitchToken");
     if (token) {
@@ -75,7 +70,7 @@ class Twitch {
    */
   public async get<T>(
     endpoint: string,
-    params: Record<string, string>
+    params: Record<string, string | number>
   ): Promise<GenericTwitchResponse<T>> {
     const response = await this.twitch.get<GenericTwitchResponse<T>>(endpoint, {
       params,
@@ -103,12 +98,8 @@ class Twitch {
     return response.data[0];
   }
 
-  public async getClips(
-    params: TwitchClipParams
-  ): Promise<GenericTwitchResponse<TwitchClip>> {
+  public async getClips(params: TwitchClipParams): Promise<TwitchClip[]> {
     const response = await this.get<TwitchClip>("clips", params);
-    return response;
+    return response.data;
   }
 }
-
-export default Twitch;

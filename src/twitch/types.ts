@@ -44,7 +44,7 @@ export type TwitchClipParams = (
       id: string;
     }
 ) & {
-  first?: string;
+  first?: number;
   started_at?: string;
   ended_at?: string;
   after?: string;
@@ -142,5 +142,4 @@ export type TwitchConfig = {
   };
   CLIPS_DIR: string;
   REMOVE_CLIPS: boolean;
-  TWITCH_AUTH_DIR: string;
 };

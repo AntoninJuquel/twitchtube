@@ -3,12 +3,12 @@ import { Config } from "./types";
 const config: Config = {
   //// General ////
   INTERVAL: 24,
-  LOG_DIR: "F:\\Documents\\logs",
+  VIDEO_LENGTH: 10,
+  METADATA_DIR: "F:\\Documents\\metadata",
 
   //// Twitch ////
-  TWITCH_AUTH_DIR: "F:\\Documents\\twitch-auth",
   CLIPS_DIR: "F:\\Videos\\clips",
-  LIMIT: 10,
+  LIMIT: 2,
   PERIOD: 24,
   SEARCH: {
     games: ["League of Legends"],
@@ -49,6 +49,7 @@ const config: Config = {
   PLAYLIST: "",
   CHANNEL_NAME: "",
   HEADLESS: false,
+  REMOVE_VIDEO: true,
 };
 
 export default config;

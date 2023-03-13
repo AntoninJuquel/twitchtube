@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf ./build && tsc",
-    "start": "yarn build && node build/index.js",
-    "start:linux": "yarn build && xvfb-run -s '-ac -screen 0 1280x1024x24' node build/index.js",
+    "start:windows": "yarn build && set NODE_ENV=production&& node build/index.js",
+    "start:linux": "yarn build && xvfb-run -s '-ac -screen 0 1280x1024x24' NODE_ENV=production node build/index.js",
     "dev": "nodemon"
   },
   "dependencies": {

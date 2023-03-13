@@ -19,4 +19,5 @@ export type YoutubeConfig = {
   PLAYLIST: string;
   CHANNEL_NAME: string;
   HEADLESS: boolean;
+  REMOVE_VIDEO: boolean;
 };

@@ -4,7 +4,9 @@ import { Config } from "./types";
 
 export const logger: Logger = createLogger();
 
-function config(config: Config) {
+function init() {
+  const logDir = path.join(__dirname, "..", "logs");
+
   logger.configure({
     level: "info",
     format: format.combine(
@@ -13,18 +15,13 @@ function config(config: Config) {
       format.splat(),
       format.json()
     ),
-
-    defaultMeta: {
-      service: "user-service",
-    },
-
     transports: [
       new transports.File({
-        filename: path.join(config.LOG_DIR, "error.log"),
+        filename: path.join(logDir, "error.log"),
         level: "error",
       }),
       new transports.File({
-        filename: path.join(config.LOG_DIR, "combined.log"),
+        filename: path.join(logDir, "combined.log"),
       }),
     ],
   });
@@ -43,5 +40,5 @@ function config(config: Config) {
 }
 
 export default {
-  config,
+  init,
 };

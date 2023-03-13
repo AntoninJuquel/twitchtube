@@ -1,32 +1,35 @@
-import { upload as uploadYoutube } from "youtube-videos-uploader";
-import { Video, Credentials } from "youtube-videos-uploader/dist/types";
-import * as path from "path";
-import { gameListSorted, broadcasterListSorted } from "../twitch";
-import { Clip } from "../types";
+import fs from "fs";
+import { upload } from "youtube-videos-uploader";
+import {
+  Video,
+  Credentials,
+  MessageTransport,
+} from "youtube-videos-uploader/dist/types";
+import path from "path";
+import { Config, Metadata } from "../types";
 import { PuppeteerLaunchOptions } from "puppeteer";
 
-import config from "../config";
+import { Logger } from "winston";
 
-function generateDescription(clips: Clip[]) {
-  const header = "Top Clips of the Week";
-  const footer = "Thanks for watching!";
+let config: Config;
+let logger: Logger;
 
-  const streamers = [
-    ...new Set(
-      clips.map((clip) => `${clip.broadcaster_name} : ${clip.broadcaster_url}`)
-    ).values(),
-  ].join("\n");
-
-  return `${header}
-
-${streamers}
-
-${footer}`;
+export async function init(c: Config, l: Logger) {
+  config = c;
+  logger = l;
 }
 
-function generateTitle(title: string, clips: Clip[]) {
-  const streamers = broadcasterListSorted(clips);
-  const games = gameListSorted(clips);
+function generateDescription(metadata: Metadata) {
+  const { broadcasters } = metadata;
+
+  const header = config.DESCRIPTION.HEADER;
+  const footer = config.DESCRIPTION.FOOTER;
+
+  return `${header}\n${broadcasters.join("\n")}\n${footer}`;
+}
+
+function generateTitle(title: string, metadata: Metadata) {
+  const { broadcasters, games, clipCount } = metadata;
 
   const replacedCount: Record<string, number> = {
     "{count}": 0,
@@ -34,9 +37,9 @@ function generateTitle(title: string, clips: Clip[]) {
     "{game}": 0,
   };
   const replacer: Record<string, () => string> = {
-    "{count}": () => clips.length.toString(),
-    "{streamer}": () => streamers[replacedCount["{streamer}"]++]?.name ?? "",
-    "{game}": () => games[replacedCount["{game}"]++]?.name ?? "",
+    "{count}": () => clipCount.toString(),
+    "{streamer}": () => broadcasters[replacedCount["{streamer}"]++] ?? "",
+    "{game}": () => games[replacedCount["{game}"]++] ?? "",
   };
 
   return title.replace(
@@ -45,26 +48,31 @@ function generateTitle(title: string, clips: Clip[]) {
   );
 }
 
-function generateTags(clips: Clip[]) {
-  const streamers = broadcasterListSorted(clips);
-  const games = gameListSorted(clips);
-
-  const tags = [
-    ...streamers.map((streamer) => streamer.name),
-    ...games.map((game) => game.name),
-  ];
-
+function generateTags(metadata: Metadata) {
+  const { broadcasters, games } = metadata;
+  const tags = [...broadcasters, ...games];
   return tags;
 }
 
-export async function upload(clips: Clip[]) {
+export async function uploadVideo() {
+  const metadata = JSON.parse(
+    fs.readFileSync(path.join(config.METADATA_DIR, "metadata.json"), "utf8")
+  ) as Metadata;
+
+  const videoPath = path.join(config.OUTPUT_DIR, `out.mp4`);
+
   const video: Video = {
-    title: generateTitle(config.TITLE, clips),
-    description: generateDescription(clips),
-    path: path.join(config.OUTPUT_DIR, `out.mp4`),
-    tags: generateTags(clips),
+    title: generateTitle(config.TITLE, metadata),
+    description: generateDescription(metadata),
+    path: videoPath,
+    tags: generateTags(metadata),
     channelName: config.CHANNEL_NAME,
+    playlist: config.PLAYLIST,
+    isAgeRestriction: false,
+    isNotForKid: true,
+    skipProcessingWait: true,
   };
+
   const credentials: Credentials = {
     email: process.env.YOUTUBE_EMAIL || "",
     pass: process.env.YOUTUBE_PASSWORD || "",
@@ -76,7 +84,19 @@ export async function upload(clips: Clip[]) {
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   };
 
-  uploadYoutube(credentials, [video], puppeteerLaunchOptions)
-    .then(console.log)
-    .catch(console.error);
+  const messageTransport: MessageTransport = {
+    log: (message) => logger.info(message),
+    userAction: (message) => logger.info(message),
+  };
+
+  logger.info(`Uploading video to YouTube...`);
+
+  await upload(credentials, [video], puppeteerLaunchOptions, messageTransport)
+    .then((url) => logger.info(`Video uploaded to ${url}`))
+    .catch(logger.error);
+
+  if (config.REMOVE_VIDEO) {
+    logger.info(`Removing video`);
+    fs.unlinkSync(videoPath);
+  }
 }
