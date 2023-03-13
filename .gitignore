@@ -1,5 +1,8 @@
 build
-yt-auth
 .env
 node_modules
 temp
+
+yt-auth
+twitch-auth
+logs

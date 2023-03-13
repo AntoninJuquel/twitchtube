@@ -1,17 +1,18 @@
 import { Config } from "./types";
 
-import { initConfig } from "./utils";
-
 const config: Config = {
   //// General ////
   INTERVAL: 24,
+  VIDEO_LENGTH: 10,
+  METADATA_DIR: "F:\\Documents\\metadata",
 
   //// Twitch ////
-  LIMIT: 10,
+  CLIPS_DIR: "F:\\Videos\\clips",
+  LIMIT: 2,
   PERIOD: 24,
   SEARCH: {
-    games: [],
-    users: ["Amouranth"],
+    games: ["League of Legends"],
+    users: [],
   },
   FILTER: {
     games: [],
@@ -22,17 +23,15 @@ const config: Config = {
     users: [],
   },
   REMOVE_CLIPS: true,
-  CLIPS_DIR: "F:\\Videos\\clips",
-  LOG_DIR: "logs",
 
   //// Video ////
+  TEMP_DIR: "F:\\Documents\\TEMP",
+  OUTPUT_DIR: "F:\\Videos\\rendered",
   RESOLUTION: {
     WIDTH: 1920,
     HEIGHT: 1080,
   },
   FRAMERATE: 60,
-  TEMP_DIR: "F:\\Documents\\TEMP",
-  OUTPUT_DIR: "F:\\Videos\\rendered",
   TRANSITION: {
     NAME: "fade",
     DURATION: 500,
@@ -50,6 +49,7 @@ const config: Config = {
   PLAYLIST: "",
   CHANNEL_NAME: "",
   HEADLESS: false,
+  REMOVE_VIDEO: true,
 };
 
-export default initConfig(config);
+export default config;

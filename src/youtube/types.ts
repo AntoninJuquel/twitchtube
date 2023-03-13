@@ -1,11 +1,10 @@
 export type YoutubeConfig = {
-
   /**
    * Title of the video
    * @use {count} to include clips count
    * @use {streamer} to include top streamer names
    * @use {game} to include top game names
-   * @example 
+   * @example
    * "[{game}] Top {count} Clips of the Week ({streamer}, {streamer}, {streamer}, ...)"
    * "[Fortnite] Top 10 Clips of the Week (Ninja, Shroud, DrDisrespect, ...)"
    */
@@ -20,4 +19,5 @@ export type YoutubeConfig = {
   PLAYLIST: string;
   CHANNEL_NAME: string;
   HEADLESS: boolean;
+  REMOVE_VIDEO: boolean;
 };

@@ -1,94 +1,105 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
-import * as path from "path";
-import { Category, CategoryId, Clip, Game, Params, TwitchClip } from "./types";
-import { convertThumbnailUrlToVideoUrl, getBroadcasterUrl } from "./utils";
+import storage from "node-persist";
+import axios, { AxiosInstance } from "axios";
 
-import config from "../config";
+import {
+  GenericTwitchResponse,
+  TwitchClipParams,
+  TwitchGame,
+  TwitchUser,
+  TwitchClip,
+} from "./types";
+import path from "path";
 
-export async function initTwitch(): Promise<AxiosInstance> {
-  const response = await axios.post("https://id.twitch.tv/oauth2/token", {
-    client_id: process.env.TWITCH_CLIENT_ID,
-    client_secret: process.env.TWITCH_CLIENT_SECRET,
-    grant_type: "client_credentials",
-  });
-  const { access_token } = response.data;
-  const twitch = axios.create({
-    baseURL: "https://api.twitch.tv/helix",
-    headers: {
-      "Client-ID": process.env.TWITCH_CLIENT_ID,
-      Authorization: `Bearer ${access_token}`,
-    },
-  });
-  twitch.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (error.response.status === 401) {
-        return initTwitch();
+export default class Twitch {
+  private twitch: AxiosInstance;
+  private clientId: string;
+  private clientSecret: string;
+
+  constructor(clientId: string, clientSecret: string) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.twitch = axios.create({
+      baseURL: "https://api.twitch.tv/helix",
+      headers: {
+        "Client-ID": this.clientId,
+      },
+    });
+    this.twitch.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response.status === 401) {
+          await this.refreshToken();
+          return this.twitch.request(error.config);
+        }
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
+    );
+  }
+
+  async init() {
+    await storage.init({
+      dir: path.join(__dirname, "..", "..", "twitch-auth"),
+    });
+    const token = await storage.getItem("twitchToken");
+    if (token) {
+      this.twitch.defaults.headers.Authorization = `Bearer ${token}`;
+    } else {
+      await this.refreshToken();
     }
-  );
+    return this;
+  }
 
-  return twitch;
-}
+  private async refreshToken() {
+    console.log("Refreshing token");
+    const response = await axios.post("https://id.twitch.tv/oauth2/token", {
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
+      grant_type: "client_credentials",
+    });
+    const { access_token } = response.data;
+    this.twitch.defaults.headers.Authorization = `Bearer ${access_token}`;
+    await storage.setItem("twitchToken", access_token);
+  }
 
-export async function getItemByName<T>(
-  twitch: AxiosInstance,
-  name: string,
-  category: Exclude<Category, Category.Clips>
-): Promise<T> {
-  const response = await twitch.get<AxiosResponse<T[]>>(`/${category}`, {
-    params: {
-      login: name,
+  /**
+   * Generic GET request to the Twitch API
+   * @doc https://dev.twitch.tv/docs/api/reference/
+   * @param endpoint Endpoint to request
+   * @param params Query parameters
+   * @returns GenericTwitchResponse<T>
+   */
+  public async get<T>(
+    endpoint: string,
+    params: Record<string, string | number>
+  ): Promise<GenericTwitchResponse<T>> {
+    const response = await this.twitch.get<GenericTwitchResponse<T>>(endpoint, {
+      params,
+    });
+    const { data } = response;
+    return data;
+  }
+
+  public async getById<T>(endpoint: string, id: string): Promise<T> {
+    const response = await this.get<T>(endpoint, { id });
+    return response.data[0];
+  }
+
+  public async getGameByName(name: string): Promise<TwitchGame> {
+    const response = await this.get<TwitchGame>("games", {
       name,
-    },
-  });
-  const { data } = response.data;
-  return data[0];
-}
+    });
+    return response.data[0];
+  }
 
-export async function getItemById<T>(
-  twitch: AxiosInstance,
-  id: string,
-  category: Category
-) {
-  const response = await twitch.get<AxiosResponse<T[]>>(`/${category}`, {
-    params: {
-      id,
-    },
-  });
-  const { data } = response.data;
-  return data[0];
-}
+  public async getUserByName(name: string): Promise<TwitchUser> {
+    const response = await this.get<TwitchUser>("users", {
+      login: name,
+    });
+    return response.data[0];
+  }
 
-export async function getClips(
-  twitch: AxiosInstance,
-  params: Params,
-  category: CategoryId,
-  id: string
-): Promise<Clip[]> {
-  const response = await twitch.get<AxiosResponse<TwitchClip[]>>("/clips", {
-    params: {
-      ...params,
-      [category]: id,
-    },
-  });
-  const { data } = response.data;
-  return await Promise.all(
-    data.map(async (clip) => ({
-      id: clip.id,
-      path: path.join(config.CLIPS_DIR, `${clip.id}.mp4`),
-      title: clip.title,
-      view_count: clip.view_count,
-      duration: clip.duration,
-      video_url: convertThumbnailUrlToVideoUrl(clip.thumbnail_url),
-      broadcaster_id: clip.broadcaster_id,
-      broadcaster_name: clip.broadcaster_name,
-      broadcaster_url: getBroadcasterUrl(clip.broadcaster_name),
-      game_id: clip.game_id,
-      game_name: (
-        await getItemById<Game>(twitch, clip.game_id, Category.Games)
-      ).name,
-    }))
-  );
+  public async getClips(params: TwitchClipParams): Promise<TwitchClip[]> {
+    const response = await this.get<TwitchClip>("clips", params);
+    return response.data;
+  }
 }
