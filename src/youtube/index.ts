@@ -3,6 +3,7 @@ import { Video, Credentials } from "youtube-videos-uploader/dist/types";
 import * as path from "path";
 import { gameListSorted, broadcasterListSorted } from "../twitch";
 import { Clip } from "../types";
+import { PuppeteerLaunchOptions } from "puppeteer";
 
 import config from "../config";
 
@@ -62,6 +63,7 @@ export async function upload(clips: Clip[]) {
     description: generateDescription(clips),
     path: path.join(config.OUTPUT_DIR, `out.mp4`),
     tags: generateTags(clips),
+    channelName: config.CHANNEL_NAME,
   };
   const credentials: Credentials = {
     email: process.env.YOUTUBE_EMAIL || "",
@@ -69,5 +71,12 @@ export async function upload(clips: Clip[]) {
     recoveryemail: process.env.YOUTUBE_RECOVERY_EMAIL || "",
   };
 
-  uploadYoutube(credentials, [video]).then(console.log).catch(console.error);
+  const puppeteerLaunchOptions: PuppeteerLaunchOptions = {
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  };
+
+  uploadYoutube(credentials, [video], puppeteerLaunchOptions)
+    .then(console.log)
+    .catch(console.error);
 }
