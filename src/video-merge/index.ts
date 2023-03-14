@@ -45,6 +45,4 @@ export async function mergeClips() {
       fs.unlinkSync(path.join(config.CLIPS_DIR, clip));
     }
   }
-
-  return output;
 }

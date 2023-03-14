@@ -59,7 +59,11 @@ export async function uploadVideo() {
     fs.readFileSync(path.join(config.METADATA_DIR, "metadata.json"), "utf8")
   ) as Metadata;
 
+  logger.info("Video metadata:", metadata);
+
   const videoPath = path.join(config.OUTPUT_DIR, `out.mp4`);
+
+  logger.info(`Video path: ${videoPath}`);
 
   const video: Video = {
     title: generateTitle(config.TITLE, metadata),
@@ -89,14 +93,14 @@ export async function uploadVideo() {
     userAction: (message) => logger.info(message),
   };
 
-  logger.info(`Uploading video to YouTube...`);
+  logger.info("Uploading video to YouTube");
 
   await upload(credentials, [video], puppeteerLaunchOptions, messageTransport)
     .then((url) => logger.info(`Video uploaded to ${url}`))
-    .catch(logger.error);
+    .catch((reason) => logger.error(`Error uploading video: ${reason}`));
 
   if (config.REMOVE_VIDEO) {
-    logger.info(`Removing video`);
+    logger.info("Removing video");
     fs.unlinkSync(videoPath);
   }
 }

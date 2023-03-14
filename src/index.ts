@@ -38,19 +38,17 @@ async function main() {
 }
 
 async function end() {
+  logger.info("Finished, clearing log files");
   logger.transports.forEach((t) => {
     if (t instanceof File) {
       fs.writeFileSync(path.join(t.dirname, t.filename), "");
     }
   });
+  logger.info("Waiting for next run");
 }
 
 async function exit() {
-  logger.transports.forEach((t) => {
-    if (t instanceof File) {
-      fs.writeFileSync(path.join(t.dirname, t.filename), "");
-    }
-  });
+
 }
 
 start()
