@@ -2,7 +2,7 @@ import shutdown from "@hypercliq/shutdown-cleanup";
 import dotenv from "dotenv";
 import { hoursToMilliseconds } from "date-fns";
 
-import config from "./config";
+import config, { init as initConfig } from "./config";
 import log, { logger } from "./logger";
 import ascii from "./ascii";
 
@@ -19,6 +19,7 @@ async function start() {
   dotenv.config();
   shutdown.registerHandler(exit);
   log.init();
+  initConfig();
 
   logger.info("Loaded environment variables");
   logger.info(`env: ${process.env.NODE_ENV}`);

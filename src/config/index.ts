@@ -53,3 +53,12 @@ const config: Config = {
 };
 
 export default config;
+
+import fs from "fs";
+
+export function init() {
+  fs.mkdirSync(config.METADATA_DIR, { recursive: true });
+  fs.mkdirSync(config.CLIPS_DIR, { recursive: true });
+  fs.mkdirSync(config.TEMP_DIR, { recursive: true });
+  fs.mkdirSync(config.OUTPUT_DIR, { recursive: true });
+}
